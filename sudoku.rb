@@ -34,7 +34,7 @@ class Board
   end
 
   def rand_set_n(n, max, random_nums)
-    total_rand = rand(1..6)
+    total_rand = rand(1..n)
     # positions in array where we have to fill numbers
     positions = rand_n(total_rand, max)
     # random numbers which will be used to fill positions
@@ -50,7 +50,7 @@ class Board
 
   def generate_row
     rand_arr = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    row_set = rand_set_n(6, 9, rand_arr)
+    row_set = rand_set_n(9, 9, rand_arr)
   end
 
   def show_board
@@ -83,7 +83,7 @@ class Board
       region_array << @board[0][0..2]
       region_array << @board[1][0..2]
       region_array << @board[2][0..2]
-      region_array
+      p region_array
     when 2
       region_array = []
       region_array << @board[0][3..3]
@@ -96,6 +96,42 @@ class Board
       region_array << @board[1][6..3]
       region_array << @board[2][6..3]
       region_array
+    when 4
+      region_array = []
+      region_array << @board[3][0..2]
+      region_array << @board[4][0..2]
+      region_array << @board[5][0..2]
+      region_array
+    when 5
+      region_array = []
+      region_array << @board[3][3..3]
+      region_array << @board[4][3..3]
+      region_array << @board[5][3..3]
+      region_array
+    when 6
+      region_array = []
+      region_array << @board[3][6..3]
+      region_array << @board[4][6..3]
+      region_array << @board[5][6..3]
+      region_array
+    when 7
+      region_array = []
+      region_array << @board[6][0..2]
+      region_array << @board[7][0..2]
+      region_array << @board[8][0..2]
+      region_array
+    when 8
+      region_array = []
+      region_array << @board[6][3..3]
+      region_array << @board[7][3..3]
+      region_array << @board[8][3..3]
+      region_array
+    when 9
+      region_array = []
+      region_array << @board[6][6..3]
+      region_array << @board[7][6..3]
+      region_array << @board[8][6..3]
+      region_array
     end
   end
 
@@ -107,32 +143,49 @@ class Board
         duplicate_col_nos << i
       end
     end
-    p "printing duplicate column indexs"
-    duplicate_col_nos
+    p "printing duplicate column index"
+    duplicate_col_nos.to_a
   end
 
   def remove_column_dup
     duplicate_col_nos = get_column_no_with_duplicates
-    duplicate_col_nos.each do |col|
-      row_with_dups = @transpose_board[col]
-      already_occured = []
-      row_with_dups.each_with_index do |ele, index|
-        if already_occured.include? ele
-          # replace duplicates with zero(let the first occurance of duplicate element remain)
-          @transpose_board[index] = 0
+    p "duplicate column nos"
+    p duplicate_col_nos
+    unless duplicate_col_nos.empty?
+      duplicate_col_nos.each do |col|
+        puts "column num"
+        p col
+        row_with_dups = @transpose_board[col]
+        already_occured = []
+        puts "row with dups"
+        p row_with_dups
+        row_with_dups.each_with_index do |ele, index|
+          if already_occured.include? ele
+            # replace duplicates with zero(let the first occurance of duplicate element remain)
+            #@transpose_board[index] = 0
+            @transpose_board[col][index] = 0
+          end
+          already_occured << ele
         end
-        already_occured << ele
       end
     end
   end
 
   def remove_region_duplicates
+    puts "In remove region duplicates"
+    (1..9).each do |region_num|
+      nums = get_region_numbers(region_num)
 
+    end
+    nums = get_region_numbers(1)
+    nums.each {|e| puts e}
   end
 
   def print_transpose
     puts "transposed board"
     @transpose_board.each{|arr| puts arr.inspect}
+    puts "oneline"
+    p @transpose_board[0]
   end
 
   def print_board_index
@@ -157,11 +210,12 @@ game = Board.new
 game.show_board
 game.get_column_no_with_duplicates
 game.remove_column_dup
+game.remove_region_duplicates
 game.print_transpose
 
-#game.get_region_numbers(1)
-#game.get_col_numbers(2)
-
+(1..9).each do |region_no|
+  game.get_region_numbers(region_no)
+end
 
 # while entering numbers in aimed filled shells, check
 # if it exists in it's column or line or region.
