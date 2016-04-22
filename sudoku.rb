@@ -30,9 +30,11 @@ class Board
   end
 
   def rand_set_n(n, max, random_nums)
-    positions = [1, 4, 7]
+    total_rand = rand(1..6)
+    # positions in array where we have to fill numbers
+    positions = rand_n(total_rand, max)
+    # random numbers which will be used to fill positions
     generated_numbers = rand_n(n, max)
-    p generated_numbers.to_a
     i = 0
     positions.each do |position|
       random_nums[position] = generated_numbers[i]
@@ -48,7 +50,7 @@ class Board
   end
 
   def show_board
-    #@board.each {|arr| puts arr.inspect}
+    @board.each {|arr| puts arr.inspect}
   end
 end
 
@@ -57,4 +59,4 @@ class Player
 end
 
 game = Board.new
-#game.show_board
+game.show_board
