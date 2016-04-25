@@ -23,6 +23,7 @@ class Board
       @board[i] = generate_row
     end
     @transpose_board = @board.transpose
+    @board_without_dup = @board
   end
 
   def rand_n(n, max)
@@ -34,6 +35,7 @@ class Board
   end
 
   def rand_set_n(n, max, random_nums)
+    # remove last line to check bug
     total_rand = rand(1..n)
     # positions in array where we have to fill numbers
     positions = rand_n(total_rand, max)
@@ -59,6 +61,9 @@ class Board
     puts "priting after transpose"
     transpose_array = @board.transpose
     transpose_array.each {|arr| puts arr.inspect}
+    p "**** in show_board"
+    p @board
+    @board.each {|arr| puts arr.inspect}
   end
 
   def make_column_value_uniq
@@ -71,8 +76,6 @@ class Board
       column_array << element[column_no]
       column_array = column_array.reject{ |e| e === 0}
     end
-    p "Printing column contents for col with index #{column_no}"
-    p column_array
   end
 
   def get_region_numbers(region_num)
@@ -80,57 +83,56 @@ class Board
     case region_num
     when 1
       region_array = []
-      region_array << @board[0][0..2]
-      region_array << @board[1][0..2]
-      region_array << @board[2][0..2]
-      p region_array
+      region_array << @board_without_dup[0][0..2]
+      region_array << @board_without_dup[1][0..2]
+      region_array << @board_without_dup[2][0..2]
+      region_array
     when 2
       region_array = []
-      region_array << @board[0][3..3]
-      region_array << @board[1][3..3]
-      region_array << @board[2][3..3]
+      region_array << @board_without_dup[0][3..5]
+      region_array << @board_without_dup[1][3..5]
+      region_array << @board_without_dup[2][3..5]
       region_array
     when 3
       region_array = []
-      region_array << @board[0][6..3]
-      region_array << @board[1][6..3]
-      region_array << @board[2][6..3]
+      region_array << @board_without_dup[0][6..8]
+      region_array << @board_without_dup[1][6..8]
+      region_array << @board_without_dup[2][6..8]
       region_array
     when 4
       region_array = []
-      region_array << @board[3][0..2]
-      region_array << @board[4][0..2]
-      region_array << @board[5][0..2]
+      region_array << @board_without_dup[3][0..2]
+      region_array << @board_without_dup[4][0..2]
+      region_array << @board_without_dup[5][0..2]
       region_array
     when 5
       region_array = []
-      region_array << @board[3][3..3]
-      region_array << @board[4][3..3]
-      region_array << @board[5][3..3]
-      region_array
+      region_array << @board_without_dup[3][3..5]
+      region_array << @board_without_dup[4][3..5]
+      region_array << @board_without_dup[5][3..5]
     when 6
       region_array = []
-      region_array << @board[3][6..3]
-      region_array << @board[4][6..3]
-      region_array << @board[5][6..3]
+      region_array << @board_without_dup[3][6..8]
+      region_array << @board_without_dup[4][6..8]
+      region_array << @board_without_dup[5][6..8]
       region_array
     when 7
       region_array = []
-      region_array << @board[6][0..2]
-      region_array << @board[7][0..2]
-      region_array << @board[8][0..2]
+      region_array << @board_without_dup[6][0..2]
+      region_array << @board_without_dup[7][0..2]
+      region_array << @board_without_dup[8][0..2]
       region_array
     when 8
       region_array = []
-      region_array << @board[6][3..3]
-      region_array << @board[7][3..3]
-      region_array << @board[8][3..3]
+      region_array << @board_without_dup[6][3..5]
+      region_array << @board_without_dup[7][3..5]
+      region_array << @board_without_dup[8][3..5]
       region_array
     when 9
       region_array = []
-      region_array << @board[6][6..3]
-      region_array << @board[7][6..3]
-      region_array << @board[8][6..3]
+      region_array << @board_without_dup[6][6..8]
+      region_array << @board_without_dup[7][6..8]
+      region_array << @board_without_dup[8][6..8]
       region_array
     end
   end
@@ -143,22 +145,18 @@ class Board
         duplicate_col_nos << i
       end
     end
-    p "printing duplicate column index"
     duplicate_col_nos.to_a
   end
 
   def remove_column_dup
+    # working fine
+    @board.each {|arr| puts arr.inspect}
+    @transpose_board = @board.transpose
     duplicate_col_nos = get_column_no_with_duplicates
-    p "duplicate column nos"
-    p duplicate_col_nos
     unless duplicate_col_nos.empty?
       duplicate_col_nos.each do |col|
-        puts "column num"
-        p col
         row_with_dups = @transpose_board[col]
         already_occured = []
-        puts "row with dups"
-        p row_with_dups
         row_with_dups.each_with_index do |ele, index|
           if already_occured.include? ele
             # replace duplicates with zero(let the first occurance of duplicate element remain)
@@ -169,16 +167,101 @@ class Board
         end
       end
     end
+    @board_without_dup = @transpose_board.transpose
+  end
+
+  def region_with_dup
+    # returns array of ids of regions which contain duplicate value
+    dup_region_ids = []
+    (1..9).each do |region_num|
+      nums = get_region_numbers(region_num)
+      nums = nums.flatten
+      if nums.uniq.length != nums.length
+        dup_region_ids << region_num
+      end
+    end
+  end
+
+  def find_duplicates(array)
+    dup_occ = array.select{ |e| array.count(e) > 1}
+    dup_occ.uniq
   end
 
   def remove_region_duplicates
-    puts "In remove region duplicates"
+    @board.each {|arr| puts arr.inspect}
     (1..9).each do |region_num|
-      nums = get_region_numbers(region_num)
+      p @board_without_dup
+      region_elements = get_region_numbers(region_num)
+      #get_region_dups = find_duplicates(region_elements)
+      #p "region duplicates"
+      #p get_region_dups
+      #p "region duplicates and their occurance index"
+      #elem_index = {}
+      # get_region_dups.each do |ele| elem_index[ele] =  region_elements.each_index.select{ |i|  region_elements[i] == ele} unless ele==0 end
 
+      # elem_index.each { |k, v| v.shift; elem_index[k] = v }
+      occurred = []
+      p @board_without_dup
+      region_elements.each do |region_row|
+        i = 0
+        p region_row
+        region_row.each do |element|
+          if occurred.include? element
+            region_row[i] = 0
+          else
+            occurred << element
+          end
+          i = i + 1
+        end
+      end
+      board_without_dup(region_elements, region_num)
     end
-    nums = get_region_numbers(1)
-    nums.each {|e| puts e}
+    p "Printing board"
+    @board.each {|arr| puts arr.inspect}
+    p "Final board without duplicates ******"
+    @board_without_dup.each {|arr| puts arr.inspect}
+  end
+
+  def board_without_dup(region_elements, region_num)
+    if region_num == 1
+      for i in 0..2 do
+        @board_without_dup[i][0..2] = region_elements[i]
+      end
+    elsif region_num == 2
+      for i in 0..2 do
+        @board_without_dup[i][3..5] = region_elements[i]
+      end
+    elsif region_num == 3
+      for i in 0..2 do
+        @board_without_dup[i][6..8] = region_elements[i]
+      end
+    elsif region_num == 4
+      p region_num
+      for i in 3..5 do
+        @board_without_dup[i][0..2] = region_elements[i-3]
+      end
+    elsif region_num == 5
+      for i in 3..5 do
+        @board_without_dup[i][3..5] = region_elements[i-3]
+      end
+    elsif region_num == 6
+      for i in 3..5 do
+        p region_elements[i]
+        @board_without_dup[i][6..8] = region_elements[i-3]
+      end
+    elsif region_num == 7
+      for i in 6..8 do
+        @board_without_dup[i][0..2] = region_elements[i-6]
+      end
+    elsif region_num == 8
+      for i in 6..8 do
+        @board_without_dup[i][3..5] = region_elements[i-6]
+      end
+    elsif region_num == 9
+      for i in 6..8 do
+        @board_without_dup[i][6..8] = region_elements[i-6]
+      end
+    end
   end
 
   def print_transpose
@@ -208,14 +291,9 @@ end
 
 game = Board.new
 game.show_board
-game.get_column_no_with_duplicates
+#game.get_column_no_with_duplicates
 game.remove_column_dup
 game.remove_region_duplicates
-game.print_transpose
-
-(1..9).each do |region_no|
-  game.get_region_numbers(region_no)
-end
 
 # while entering numbers in aimed filled shells, check
 # if it exists in it's column or line or region.
