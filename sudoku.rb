@@ -58,12 +58,13 @@ class Board
   def show_board
     puts "printing board"
     @board.each {|arr| puts arr.inspect}
-    puts "priting after transpose"
+    # puts "priting after transpose"
     transpose_array = @board.transpose
     transpose_array.each {|arr| puts arr.inspect}
-    p "**** in show_board"
-    p @board
-    @board.each {|arr| puts arr.inspect}
+    # p "**** in show_board"
+    # p @board
+    p "board_without_dup ******"
+    @board_without_dup.each {|arr| puts arr.inspect}
   end
 
   def make_column_value_uniq
@@ -160,7 +161,6 @@ class Board
         row_with_dups.each_with_index do |ele, index|
           if already_occured.include? ele
             # replace duplicates with zero(let the first occurance of duplicate element remain)
-            #@transpose_board[index] = 0
             @transpose_board[col][index] = 0
           end
           already_occured << ele
@@ -192,14 +192,6 @@ class Board
     (1..9).each do |region_num|
       p @board_without_dup
       region_elements = get_region_numbers(region_num)
-      #get_region_dups = find_duplicates(region_elements)
-      #p "region duplicates"
-      #p get_region_dups
-      #p "region duplicates and their occurance index"
-      #elem_index = {}
-      # get_region_dups.each do |ele| elem_index[ele] =  region_elements.each_index.select{ |i|  region_elements[i] == ele} unless ele==0 end
-
-      # elem_index.each { |k, v| v.shift; elem_index[k] = v }
       occurred = []
       p @board_without_dup
       region_elements.each do |region_row|
@@ -216,9 +208,7 @@ class Board
       end
       board_without_dup(region_elements, region_num)
     end
-    p "Printing board"
-    @board.each {|arr| puts arr.inspect}
-    p "Final board without duplicates ******"
+    p "Final board without duplicates"
     @board_without_dup.each {|arr| puts arr.inspect}
   end
 
@@ -278,9 +268,117 @@ class Board
       row.each_with_index do |element, index|
         elem_hash = Hash.new
         p i.to_s + ", " + index.to_s
-
       end
       i = i + 1
+    end
+  end
+
+  def start_game
+    puts "Welcome to Sudoku.To stop the game press 'Ctrl + c'"
+    show_board
+    remove_column_dup
+    remove_region_duplicates
+    take_user_input
+  end
+
+  def valid_for_row?(row_num, input)
+    row_elements = @board_without_dup[row_num - 1]
+    p "in valid_for_row"
+    p row_elements
+    if row_elements.include?(input.to_i)
+      p "*************** in false ********** illusion"
+      return false
+      #raise InvalidInputException
+    else
+      p "valid row ********** illusion"
+      return true
+    end
+  end
+
+  def valid_for_column?(column_num, input)
+    p "valid_for_column"
+    transposed_block = @board_without_dup.transpose
+    p "transposed b;lock "
+    p transposed_block
+    column_elements = transposed_block[column_num - 1]
+    p column_elements
+    if column_elements.include?(input.to_i)
+      return false
+      #raise InvalidInputException
+    else
+      p "valid column"
+      return true
+    end
+  end
+
+  def valid_for_region?(region_num, input)
+    region_elements = get_region_numbers(region_num.to_i)
+    if region_elements.include?(input.to_i)
+      return false
+      #raise InvalidInputException
+    else
+      p "valid region"
+      return true
+    end
+  end
+
+  # tells the region number based on row and column value of input number
+  def find_region_number(row_num, column_num)
+    p "in find region number"
+    p row_num
+    p column_num
+    row_num = row_num.to_i
+    column_num = column_num.to_i
+    bool = row_num.between?(1, 3)
+    p bool
+
+    if row_num.between?(1,3) && column_num.between?(1,3)
+      return 1
+    elsif row_num.between?(1,3) && column_num.between?(4,6)
+      return 2
+    elsif row_num.between?(1,3) && column_num.between?(7,9)
+      return 3
+    elsif row_num.between?(4,6) && column_num.between?(1,3)
+      return 4
+    elsif row_num.between?(4,6) && column_num.between?(4,6)
+      return 5
+    elsif row_num.between?(4,6) && column_num.between?(7,9)
+      return 6
+    elsif row_num.between?(7,9) && column_num.between?(1,3)
+      return 7
+    elsif row_num.between?(7,9) && column_num.between?(4,6)
+      return 8
+    elsif row_num.between?(7,9) && column_num.between?(7,9)
+      return 9
+    end
+  end
+
+  def take_user_input
+    puts "Enter row number(1-9)and column number(1-9) of location to input number at(eg. row_no, column_no)"
+    input_location = gets.chomp
+    inputs = input_location.split(",")
+    begin
+      row_no = inputs[0].strip.to_i
+      column_no = inputs[1].strip.to_i
+      target_board_element = @board_without_dup[row_no-1][column_no-1]
+      if target_board_element == 0
+        puts "Enter the number to fill at desired location (1-9)"
+        input_num = gets.chomp
+        p "Input num"
+        p input_num
+        region_num = find_region_number(row_no, column_no)
+        p "region_num"
+        p region_num
+        if valid_for_row?(row_no, input_num) && valid_for_column?(column_no, input_num) && valid_for_region?(region_num, input_num)
+          @board_without_dup[row_no-1][column_no-1] = input_num.to_i
+          show_board
+        else
+          puts "You can not enter number at filled position.Please choose another location"
+        end
+      end
+      take_user_input
+    rescue Exception
+      puts "Error while accepting user input"
     end
   end
 end
@@ -290,10 +388,7 @@ class Player
 end
 
 game = Board.new
-game.show_board
-#game.get_column_no_with_duplicates
-game.remove_column_dup
-game.remove_region_duplicates
+game.start_game
 
 # while entering numbers in aimed filled shells, check
 # if it exists in it's column or line or region.
