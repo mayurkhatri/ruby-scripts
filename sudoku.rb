@@ -46,7 +46,6 @@ class Board
       random_nums[position] = generated_numbers[i]
       i = i + 1
     end
-    puts "printing random numbers"
     p random_nums
   end
 
@@ -56,13 +55,6 @@ class Board
   end
 
   def show_board
-    puts "printing board"
-    @board.each {|arr| puts arr.inspect}
-    # puts "priting after transpose"
-    transpose_array = @board.transpose
-    transpose_array.each {|arr| puts arr.inspect}
-    # p "**** in show_board"
-    # p @board
     p "board_without_dup ******"
     @board_without_dup.each {|arr| puts arr.inspect}
   end
@@ -151,7 +143,7 @@ class Board
 
   def remove_column_dup
     # working fine
-    @board.each {|arr| puts arr.inspect}
+    #@board.each {|arr| puts arr.inspect}
     @transpose_board = @board.transpose
     duplicate_col_nos = get_column_no_with_duplicates
     unless duplicate_col_nos.empty?
@@ -188,15 +180,15 @@ class Board
   end
 
   def remove_region_duplicates
-    @board.each {|arr| puts arr.inspect}
+    #@board.each {|arr| puts arr.inspect}
     (1..9).each do |region_num|
-      p @board_without_dup
+      #p @board_without_dup
       region_elements = get_region_numbers(region_num)
       occurred = []
-      p @board_without_dup
+#      p @board_without_dup
       region_elements.each do |region_row|
         i = 0
-        p region_row
+        #p region_row
         region_row.each do |element|
           if occurred.include? element
             region_row[i] = 0
@@ -208,8 +200,8 @@ class Board
       end
       board_without_dup(region_elements, region_num)
     end
-    p "Final board without duplicates"
-    @board_without_dup.each {|arr| puts arr.inspect}
+    #p "Final board without duplicates"
+    #@board_without_dup.each {|arr| puts arr.inspect}
   end
 
   def board_without_dup(region_elements, region_num)
@@ -226,7 +218,6 @@ class Board
         @board_without_dup[i][6..8] = region_elements[i]
       end
     elsif region_num == 4
-      p region_num
       for i in 3..5 do
         @board_without_dup[i][0..2] = region_elements[i-3]
       end
@@ -236,7 +227,6 @@ class Board
       end
     elsif region_num == 6
       for i in 3..5 do
-        p region_elements[i]
         @board_without_dup[i][6..8] = region_elements[i-3]
       end
     elsif region_num == 7
@@ -275,7 +265,7 @@ class Board
 
   def start_game
     puts "Welcome to Sudoku.To stop the game press 'Ctrl + c'"
-    show_board
+    #show_board
     remove_column_dup
     remove_region_duplicates
     take_user_input
@@ -283,30 +273,22 @@ class Board
 
   def valid_for_row?(row_num, input)
     row_elements = @board_without_dup[row_num - 1]
-    p "in valid_for_row"
-    p row_elements
     if row_elements.include?(input.to_i)
-      p "*************** in false ********** illusion"
       return false
       #raise InvalidInputException
     else
-      p "valid row ********** illusion"
       return true
     end
   end
 
   def valid_for_column?(column_num, input)
-    p "valid_for_column"
     transposed_block = @board_without_dup.transpose
-    p "transposed b;lock "
-    p transposed_block
     column_elements = transposed_block[column_num - 1]
-    p column_elements
+    #p column_elements
     if column_elements.include?(input.to_i)
       return false
       #raise InvalidInputException
     else
-      p "valid column"
       return true
     end
   end
@@ -317,20 +299,14 @@ class Board
       return false
       #raise InvalidInputException
     else
-      p "valid region"
       return true
     end
   end
 
   # tells the region number based on row and column value of input number
   def find_region_number(row_num, column_num)
-    p "in find region number"
-    p row_num
-    p column_num
     row_num = row_num.to_i
     column_num = column_num.to_i
-    bool = row_num.between?(1, 3)
-    p bool
 
     if row_num.between?(1,3) && column_num.between?(1,3)
       return 1
@@ -354,6 +330,8 @@ class Board
   end
 
   def take_user_input
+    p "Priting board"
+    @board_without_dup.each {|row| puts row.inspect}
     puts "Enter row number(1-9)and column number(1-9) of location to input number at(eg. row_no, column_no)"
     input_location = gets.chomp
     inputs = input_location.split(",")
@@ -364,17 +342,15 @@ class Board
       if target_board_element == 0
         puts "Enter the number to fill at desired location (1-9)"
         input_num = gets.chomp
-        p "Input num"
-        p input_num
         region_num = find_region_number(row_no, column_no)
-        p "region_num"
-        p region_num
         if valid_for_row?(row_no, input_num) && valid_for_column?(column_no, input_num) && valid_for_region?(region_num, input_num)
           @board_without_dup[row_no-1][column_no-1] = input_num.to_i
           show_board
         else
           puts "You can not enter number at filled position.Please choose another location"
         end
+      else
+        puts "Board location already has a number.Please choose another location"
       end
       take_user_input
     rescue Exception
