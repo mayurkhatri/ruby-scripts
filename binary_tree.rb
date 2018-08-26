@@ -1,13 +1,14 @@
 class Tree
+  attr_accessor :root_node
   def initialize
     @root_node
   end
 
   def add_child(node)
-    if @root_node.nil?
-      @root_node = node
+    if root_node.nil?
+      root_node = node
     else
-      @root_node.add_child(@root_node, node)
+      root_node.add_child(root_node, node)
     end
   end
 
@@ -21,10 +22,10 @@ class Tree
   end
 
   def mirror_image
-    if @root_node.nil?
-      puts "no element in tree"
+    if root_node.nil?
+      puts "no elements present in tree"
     else
-      @root_node.mirror_image
+      root_node.mirror_image
     end
   end
 end
@@ -53,23 +54,18 @@ class Node
   end
 
   def mirror_image
-    if self.nil?
-      return
-    else
-      self.left.mirror_image if !left.nil?
-      self.right.mirror_image if !right.nil?
+    p self.value
+    self.left.mirror_image if !left.nil?
+    self.right.mirror_image if !right.nil?
 
-      temp = self.left
-      self.left = self.right
-      self.right = temp
-    end
+    temp = self.left
+    self.left = self.right
+    self.right = temp
   end
 end
 
 # initial setup
 tree = Tree.new
-# node = Node.new(5)
-# tree.add_child(node)
 
 root = Node.new("I")
 tree.add_child(root)
@@ -87,8 +83,8 @@ root.right.right = Node.new("M")
 root.left.left.left = Node.new("A")
 root.left.left.right = Node.new("G")
 
-pre_order = tree.pre_order(root)
-p pre_order
+# pre_order = tree.pre_order(root)
+# p pre_order
 
 tree.mirror_image
 pre_order = tree.pre_order(root)
