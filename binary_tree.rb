@@ -54,7 +54,7 @@ class Node
   end
 
   def mirror_image
-    p self.value
+    # p self.value
     self.left.mirror_image if !left.nil?
     self.right.mirror_image if !right.nil?
 
