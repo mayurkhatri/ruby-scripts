@@ -5,10 +5,10 @@ class Tree
   end
 
   def add_child(node)
-    if root_node.nil?
-      root_node = node
+    if @root_node.nil?
+      @root_node = node
     else
-      root_node.add_child(root_node, node)
+      @root_node.add_child(@root_node, node)
     end
   end
 
@@ -54,9 +54,8 @@ class Node
   end
 
   def mirror_image
-    # p self.value
-    self.left.mirror_image if !left.nil?
-    self.right.mirror_image if !right.nil?
+    self.left.mirror_image if !self.left.nil?
+    self.right.mirror_image if !self.right.nil?
 
     temp = self.left
     self.left = self.right
@@ -66,6 +65,8 @@ end
 
 # initial setup
 tree = Tree.new
+# node = Node.new(5)
+# tree.add_child(node)
 
 root = Node.new("I")
 tree.add_child(root)
